@@ -1,0 +1,80 @@
+#include<LiquidCrystal.h>
+// initialize the library by associating any needed LCD interface pin
+// with the arduino pin number it is connected to
+LiquidCrystal lcd(13,12,11,10,9,8);
+// IR1 will sense the entry of person in the room
+// IR2 will sense the exit of	person from the room.
+// relay will be used to turn the light on and off in the room.
+#define in A0	//	analog pin A0 will take input from IR1.
+#define out A5 //	analog pin A0 will take input from IR2.
+#define relay 2 // digital pin 2 will give output to relay.
+int count=0; //initialising the person count in the room to zero.
+int valin=0; //valin is variable that stores input from A0
+int valout=0;//valout is variable that stores input from A5
+void setup()
+{
+// this code will run once
+lcd.begin(16,2); // set up the LCD's number of columns and rows:
+lcd.print("Visitor Counter"); //initially this will be displayed
+delay(500);
+pinMode(in, INPUT);//initialize analog pin AO an input.
+pinMode(out, INPUT);// initialize analog pin A5 an input.
+pinMode(relay, OUTPUT);// initialize digital pin 2 as output.
+lcd.clear();
+lcd.print("Person In Room:");
+lcd.setCursor(0,1);
+lcd.print(count);//printing initial count=0 ,ie nobody in	room
+delay(500);
+lcd.print("Nobody In Room");
+lcd.setCursor(0,1);
+lcd.print("Light Is Off");
+}void loop() {
+// this code will be run repeatedly
+valin=digitalRead(in);
+valout=digitalRead(out);
+if(valin==HIGH)
+{
+// this code will run when any person enter the room
+count=count+1;
+lcd.clear();
+lcd.print("Person in Room:");
+lcd.setCursor(0,1);
+lcd.print(count);
+digitalWrite(relay, HIGH);//light will be still switched on
+delay(1000);
+}
+else if(valout==HIGH)
+{
+if(count<=0)
+{// this code will run when counter becomes negative
+lcd.clear();
+digitalWrite(relay, LOW);//light will be turned off(count<o) lcd.clear();
+lcd.print("Nobody In Room");
+lcd.setCursor(0,1);
+lcd.print("Light Is Off");
+delay(1000);
+}	else
+{
+// this code will run when any person exits the room (count>0)
+count=count-1;
+lcd.clear();
+lcd.print("Person in Room:");
+lcd.setCursor(0,1);
+lcd.print(count);
+digitalWrite(relay, HIGH); //light will be still switched on
+delay(1000);
+valout=LOW ;
+}
+}
+if(count==0)
+{
+//this code will run when nobody is in the room
+lcd.clear();
+digitalWrite(relay, LOW);//light will be turned off(count=o)
+lcd.clear();
+lcd.print("Nobody In Room");
+lcd.setCursor(0,1);
+lcd.print("Light Is Off");
+delay(200);
+}
+}
